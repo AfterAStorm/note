@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+# note #
+
+import os, sys, argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('note', default=None, nargs='?')
+group = parser.add_mutually_exclusive_group()
+group.add_argument('-e', '--edit', action='store_true', help='edit a note')
+group.add_argument('-l', '--list', action='store_true', help='list all notes')
+args = parser.parse_args()
+
+note = args.note or 'note'
+notes = os.path.expanduser(f'~/.notes')
+path = f'{notes}/{note}'
+
+def edit():
+	os.system(f'nano {path} -t')
+
+def show():
+	with open(path, 'r') as f:
+		print(f.read())
+
+try:
+	os.mkdir(notes)
+except:
+	pass
+
+if args.edit:
+	edit()
+elif args.list:
+	print(str.join(', ', os.listdir(notes)))
+else: # print
+	if not os.path.isfile(path):
+		print(f'Note \"{note}\" doesn\'t exist')
+		createResponse = input('Create? (Y/n) ')
+		if createResponse.lower() in ['yes', 'y', '']:
+			edit()
+	else:
+		show()
